@@ -1,0 +1,140 @@
+import psycopg2
+import csv
+
+conn = psycopg2.connect(host="cc3201.dcc.uchile.cl", database="cc3201",
+    user="cc3201",
+    password="j'<3_cc3201", port="5440")
+
+cur = conn.cursor()
+
+
+#cur.execute("truncate table atleta restart identity cascade")
+#cur.execute("truncate table pais restart identity cascade")
+#cur.execute("truncate table entrenador restart identity cascade")
+#cur.execute("truncate table disciplina restart identity cascade")
+#cur.execute("truncate table evento restart identity cascade")
+#cur.execute("truncate table deporte restart identity cascade")
+#cur.execute("truncate table medalla restart identity cascade")
+#cur.execute("truncate table evento_disciplina restart identity cascade")
+#cur.execute("truncate table disciplina_atleta restart identity cascade")
+#cur.execute("truncate table entrenador_atleta restart identity cascade")
+
+
+with open('./Data/athletes.csv') as csvfile:
+    reader = csv.reader(csvfile, delimiter=',', quotechar='"')
+    i = 0
+    for row in reader:
+        i+=1
+        if i == 1:
+            continue
+        print(i)
+        #if i >30:
+         #   break
+
+        # Poblar atletas
+        atleta_id = row[0]
+        atleta_nombre = row[1]
+        atleta_genero = row[4]
+
+        # Pasar a español
+        if atleta_genero == "Male":
+            atleta_genero = "Masculino"
+        else:
+            atleta_genero = "Femenino"
+
+        atleta_nacionalidad = row[9]
+        
+        atleta_pais_residencia = row[20]
+        if atleta_pais_residencia == "":
+            atleta_pais_residencia = None
+        
+        atleta_altura = row[12]
+        if atleta_altura == "" or int(float(atleta_altura)) == 0:
+            atleta_altura = None
+        
+        atleta_peso = row[13]
+        if atleta_peso == "" or int(float(atleta_peso)) == 0:
+            atleta_peso = None
+        
+
+        atleta_fecha_nacimiento = str(row[16])
+        atleta_lugar_nacimiento = row[17]
+        if atleta_lugar_nacimiento == "":
+            atleta_lugar_nacimiento = None
+
+        info = [atleta_id, atleta_nombre, atleta_fecha_nacimiento, atleta_genero]
+        #print("Nombre atleta: " + atleta_nombre + ", Id atleta: " + atleta_id)
+        print(info)
+
+        cur.execute("insert into atleta values (%s, %s, %s, %s, %s, %s, %s, %s, %s)",
+                    [atleta_id, atleta_nombre, atleta_genero, atleta_nacionalidad, atleta_pais_residencia, atleta_altura, atleta_peso, atleta_fecha_nacimiento, atleta_lugar_nacimiento])
+
+
+# Poblar Entrenador
+with open('./Data/coaches.csv') as csvfile:
+    reader = csv.reader(csvfile, delimiter=',', quotechar='"')
+    i = 0
+    for row in reader:
+        i+=1
+        if i == 1:
+            continue
+        print(i)
+
+        entrenador_id = row[0]
+        entrenador_nombre = row[1]
+        entrenador_genero = row[2]
+        if entrenador_genero == "Male":
+            entrenador_genero = "Masculino"
+        else:
+            entrenador_genero = "Femenino"
+
+        entrenador_funcion = row[3]
+        if entrenador_funcion == "Coach":
+            entrenador_funcion = "Entrenador"
+        elif entrenador_funcion == "Head Coach":
+            entrenador_funcion = "Entrenador en jefe"
+        elif entrenador_funcion == "Assistant Coach":
+            entrenador_funcion = "Entrenador asistente"
+        
+        entrenador_categoria = row[4]
+
+
+        # Creo que puede ser en que país dirige, no necesariamente su nacionalidad
+
+        entrenador_nacionalidad = row[6]
+
+        # Podríamos incluir la disciplina que coachea
+        cur.execute("insert into entrenador values (%s, %s, %s, %s, %s, %s)",
+                    [entrenador_id, entrenador_nombre, entrenador_genero, entrenador_funcion, entrenador_categoria, entrenador_nacionalidad])
+
+
+#Poblar Pais
+with open('./Data/medals_total.csv') as csvfile:
+    reader = csv.reader(csvfile, delimiter=',', quotechar='"')
+    i = 0
+    for row in reader:
+        i+=1
+        if i == 1:
+            continue
+        print(i)
+
+        # Cambie nombre, a codigo del pais, por como están los datos
+        # Además incluiré la cantidad de oros, platas y bronces
+
+        pais_codigo = row[0]
+        pais_oros = row[1]
+        pais_platas = row[2]
+        pais_bronces = row[3]
+        pais_total = row[4] 
+        
+        cur.execute("insert into pais values (%s, %s, %s, %s, %s)",
+                    [pais_codigo, pais_oros, pais_platas, pais_bronces, pais_total])
+        
+#with open('./Data/medals_total.csv') as csvfile:
+ #   reader = csv.reader(csvfile, delimiter=',', quotechar='"')
+  #  i = 0
+   # for row in reader:
+    #    i+=1
+     #   if i == 1:
+      #      continue
+       # print(i)

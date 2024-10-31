@@ -1,0 +1,73 @@
+Estudiantes:
+- Diego Espinoza
+- Julián Ferreira
+
+P1.- Creación de tablas:
+
+create table if not exists superheroes.ochocincouno_superhero(
+	id serial primary key ,
+	name varchar(255) not null,
+    height integer , 
+    weight integer
+);
+
+create table if not exists superheroes.ochocincouno_character(
+    superhero_id serial primary key,
+    biography_name varchar(255) ,  
+    foreign key (superhero_id) references ochocincouno_superhero(id)
+);
+
+create table if not exists superheroes.ochocincouno_alter_ego(
+    id serial primary key,
+    name varchar(255) not null
+);
+
+create table if not exists superheroes.ochocincouno_work_occupation(
+  id serial primary key,
+    name varchar(255)
+);
+
+create table if not exists superheroes.ochocincouno_superhero_alter_ego(
+    superhero_id serial not null,
+    alter_ego_id serial not null,
+    primary key (superhero_id, alter_ego_id),
+    foreign key (superhero_id) references ochocincouno_superhero(id),
+    foreign key (alter_ego_id) references ochocincouno_alter_ego(id)
+);
+
+create table if not exists superheroes.ochocincouno_superhero_work_occupation(
+    superhero_id serial not null,
+    work_occupation_id serial not null,
+    primary key (superhero_id, work_occupation_id),
+    foreign key (superhero_id) references ochocincouno_superhero(id),
+    foreign key (work_occupation_id) references ochocincouno_work_occupation(id)
+);
+
+
+
+P3.- Consultas
+
+a.- Seleccionar el nombre y el peso de los 10 personajes más pesados:
+
+select name, weight as peso_en_gramos from ochocincouno_superhero order by weight desc limit 10;
+
+b.- Seleccionar los 10 personajes más altos:
+
+select S.name, S.height, C.biography_name 
+from ochocincouno_superhero as S join ochocincouno_character as C
+on S.id = C.superhero_id
+where S.height is not null
+order by S.height desc
+limit 10;
+
+
+c.- Los 3 trabajos más populares:
+
+select W.name, count(*)
+from ochocincouno_work_occupation as W join ochocincouno_superhero_work_occupation as SHW
+on W.id = SHW.work_occupation_id
+group by W.name
+order by count(*) desc
+limit 3;
+
+

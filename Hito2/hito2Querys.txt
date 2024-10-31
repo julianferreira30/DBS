@@ -1,0 +1,124 @@
+Creación de tablas:
+
+---------Atleta-------
+create table if not exists atleta(
+    id integer primary key,
+    nombre varchar(255) not null,
+    genero varchar(255) not null,
+    nacionalidad varchar(255) not null,
+    pais_residencia varchar(255),
+    altura integer,
+    peso integer,
+    fecha_nacimiento varchar(255) not null,
+    lugar_nacimiento varchar(255)
+)
+
+------Entrenador----
+create table if not exists entrenador(
+    id integer primary key,
+    nombre varchar(255) not null,
+    genero varchar(255) not null,
+    funcion varchar(255) not null,
+    categoria varchar(255) not null,
+    nacionalidad varchar(255) not null
+)
+
+-----Pais------
+create table if not exists pais(
+    nombre varchar(255) primary key,
+    recuento_medallas integer not null,
+
+
+
+
+    oros integer not null,
+    platas integer not null,
+    bronces integer not null,
+)
+
+------Disciplina-------
+create table if not exists disciplina(
+    id serial primary key,
+    nombre varchar(255) not null
+)
+
+--------Evento--------
+create table if not exists evento(
+    nombre varchar(255) primary key,
+    ganador not null
+)
+
+-------Deporte--------
+create table if not exists deporte(
+    nombre varchar(255) not null
+)
+
+-------Medalla-------
+create table if not exists medalla(
+    id integer not null,
+    evento_ganador integer not null,
+    atleta_id integer not null,
+    tipo varchar(255) not null,
+    primary key (id, evento_ganador, atleta_id),
+    foreign key (evento_ganador) references evento(ganador),
+    foreign key (atleta_id) references atleta(id),
+)
+
+-------------Contiene------------
+___________SE PODRIA CAMBIAR EL NOMBRE_______
+create table if not exists evento_disciplina(
+    disciplina_id integer not null,
+    evento_nombre integer not null,
+    phase varchar(255) not null,
+    venue varchar(255) nor null,
+    primary key (disciplina_id, evento_nombre),
+    foreign key (disciplina_id) references disciplina(id),
+    foreign key (evento_nombre) references evento(nombre)
+)
+
+-------------------Representa------------------
+--------CAMBIARE EL NOMBRE-----------------
+create table if not exists atleta_pais(
+    atleta_id integer not null,
+    pais_nombre varchar(255) not null,
+    primary key (atleta_id, pais_nombre),
+    foreign key (atleta_id) references atleta(id),
+    foreign key (pais_nombre) references pais(nombre)
+)
+
+
+
+
+
+
+------------Compite_en------------
+____________TAMBIEN SE PUEDE CAMBIAR EL NOMBRE_________
+create table if not exists evento_atleta(
+    evento_nombre varchar(255) not null,
+    atleta_id integer not null,
+    primary key (evento_nombre, atleta_id),
+    foreign key (evento_nombre) references evento(nombre),
+    foreign key (atleta_id) references atleta(id)
+)
+
+--------Entrena-------
+create table if not exists entrenador_atleta(
+    entrenador_id integer not null,
+    atleta_id integer not null,
+    primary key (entrenador_id, atleta_id),
+    foreign key (entrenador_id) references entrenador(id),
+    foreign key (atleta_id) references atleta(id)
+)
+
+
+
+----------Medallista---------
+create table if not exists medalla_evento_atleta(
+    medalla_id integer not null,
+    evento_nombre varchar not null,
+    atleta_id integer not null,
+    primary key (medalla_id, evento_nombre, atleta_id),
+    foreign key medalla_id references medalla(id),
+    foreign key evento_nombre references evento(nombre),
+    foreign key atleta_id references atleta(id)
+)
