@@ -25,7 +25,7 @@ create table if not exists entrenador(
 
 -----Pais------
 create table if not exists pais(
-    nombre varchar(255) primary key,
+    id integer primary key,
     recuento_medallas integer not null,
 
 
@@ -45,22 +45,18 @@ create table if not exists disciplina(
 --------Evento--------
 create table if not exists evento(
     nombre varchar(255) primary key,
-    ganador not null
+    ganador varchar(255) not null
 )
 
--------Deporte--------
-create table if not exists deporte(
-    nombre varchar(255) not null
-)
 
 -------Medalla-------
 create table if not exists medalla(
     id integer not null,
-    evento_ganador integer not null,
+    evento_nombre varchar(255) not null,
     atleta_id integer not null,
     tipo varchar(255) not null,
-    primary key (id, evento_ganador, atleta_id),
-    foreign key (evento_ganador) references evento(ganador),
+    primary key (id, evento_nombre, atleta_id),
+    foreign key (evento_nombre) references evento(nombre),
     foreign key (atleta_id) references atleta(id),
 )
 
@@ -80,15 +76,11 @@ create table if not exists evento_disciplina(
 --------CAMBIARE EL NOMBRE-----------------
 create table if not exists atleta_pais(
     atleta_id integer not null,
-    pais_nombre varchar(255) not null,
-    primary key (atleta_id, pais_nombre),
+    pais_id varchar(255) not null,
+    primary key (atleta_id, pais_id),
     foreign key (atleta_id) references atleta(id),
-    foreign key (pais_nombre) references pais(nombre)
+    foreign key (pais_id) references pais(id)
 )
-
-
-
-
 
 
 ------------Compite_en------------

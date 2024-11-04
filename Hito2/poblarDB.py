@@ -129,12 +129,33 @@ with open('./Data/medals_total.csv') as csvfile:
         
         cur.execute("insert into pais values (%s, %s, %s, %s, %s)",
                     [pais_codigo, pais_oros, pais_platas, pais_bronces, pais_total])
+
+
+# Poblar tabla Evento
+with open('./Data/medals.csv') as csvfile:
+    reader = csv.reader(csvfile, delimiter=',', quotechar='"')
+    i = 0
+    for row in reader:
+        i+=1
+        if i == 1:
+            continue
+        print(i)
+        # Significa que estamos viendo el ganador (medalla de oro)
+        if row[1] == 1:
+            evento_disciplina = row[6] 
+            evento_genero = row[5]
+            # Hay 2 eventos con el mismo nombre, ya que está masculino y femenino,
+            # asique se hace que el nombre del evento sea la concatenacion del genero al final.
+            evento_nombre = evento_disciplina + ' ' + evento_genero 
+            evento_ganador = row[3]
+            cur.execute("insert into evento values (%s, %s)", [evento_nombre, evento_ganador])
         
-#with open('./Data/medals_total.csv') as csvfile:
- #   reader = csv.reader(csvfile, delimiter=',', quotechar='"')
-  #  i = 0
-   # for row in reader:
-    #    i+=1
-     #   if i == 1:
-      #      continue
-       # print(i)
+        # Aprovechamos de poblar la tabla Medalla
+        medalla_id = row[1]
+        medalla_evento_nombre = row[6] + ' ' + row[5]
+        medalla_atleta_id = row[10]
+        medalla_tipo = row[0]
+        cur.execute("insert into medalla values (%s, %s, %s, %s)", 
+                    [medalla_id, medalla_evento_nombre, medalla_atleta_id, medalla_tipo])
+
+# Poblar evento_disciplina
