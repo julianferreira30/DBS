@@ -19,7 +19,7 @@ cur = conn.cursor()
 #cur.execute("truncate table disciplina_atleta restart identity cascade")
 #cur.execute("truncate table entrenador_atleta restart identity cascade")
 
-
+atleta_pais_cache = []
 with open('./Data/athletes.csv') as csvfile:
     reader = csv.reader(csvfile, delimiter=',', quotechar='"')
     i = 0
@@ -35,7 +35,7 @@ with open('./Data/athletes.csv') as csvfile:
         atleta_id = row[0]
         atleta_nombre = row[1]
         atleta_genero = row[4]
-
+        atleta_pais_id = row[6]
         # Pasar a español
         if atleta_genero == "Male":
             atleta_genero = "Masculino"
@@ -65,6 +65,8 @@ with open('./Data/athletes.csv') as csvfile:
         info = [atleta_id, atleta_nombre, atleta_fecha_nacimiento, atleta_genero]
         #print("Nombre atleta: " + atleta_nombre + ", Id atleta: " + atleta_id)
         print(info)
+
+        atleta_pais_cache.append([atleta_id, atleta_pais_id])
 
         cur.execute("insert into atleta values (%s, %s, %s, %s, %s, %s, %s, %s, %s)",
                     [atleta_id, atleta_nombre, atleta_genero, atleta_nacionalidad, atleta_pais_residencia, atleta_altura, atleta_peso, atleta_fecha_nacimiento, atleta_lugar_nacimiento])
@@ -159,3 +161,11 @@ with open('./Data/medals.csv') as csvfile:
                     [medalla_id, medalla_evento_nombre, medalla_atleta_id, medalla_tipo])
 
 # Poblar evento_disciplina
+
+
+# Poblar atleta_pais
+for dupla in range(len(atleta_pais_cache)):
+    atleta_id = dupla[0]
+    pais_id = dupla[1]
+
+    cur.execute("insert into atleta_pais values (%s, %s)", [atleta_id, pais_id])
