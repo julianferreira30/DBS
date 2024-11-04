@@ -27,9 +27,6 @@ with open('./Data/athletes.csv') as csvfile:
         i+=1
         if i == 1:
             continue
-        print(i)
-        #if i >30:
-         #   break
 
         # Poblar atletas
         atleta_id = row[0]
@@ -62,14 +59,15 @@ with open('./Data/athletes.csv') as csvfile:
         if atleta_lugar_nacimiento == "":
             atleta_lugar_nacimiento = None
 
+        ############ SOLO PARA VER COMO SE VE LA INFO ########################
         info = [atleta_id, atleta_nombre, atleta_fecha_nacimiento, atleta_genero]
-        #print("Nombre atleta: " + atleta_nombre + ", Id atleta: " + atleta_id)
         print(info)
+        ########################
 
         atleta_pais_cache.append([atleta_id, atleta_pais_id])
 
         cur.execute("insert into atleta values (%s, %s, %s, %s, %s, %s, %s, %s, %s)",
-                    [atleta_id, atleta_nombre, atleta_genero, atleta_nacionalidad, atleta_pais_residencia, atleta_altura, atleta_peso, atleta_fecha_nacimiento, atleta_lugar_nacimiento])
+                   [atleta_id, atleta_nombre, atleta_genero, atleta_nacionalidad, atleta_pais_residencia, atleta_altura, atleta_peso, atleta_fecha_nacimiento, atleta_lugar_nacimiento])
 
 
 # Poblar Entrenador
@@ -107,7 +105,7 @@ with open('./Data/coaches.csv') as csvfile:
 
         # Podríamos incluir la disciplina que coachea
         cur.execute("insert into entrenador values (%s, %s, %s, %s, %s, %s)",
-                    [entrenador_id, entrenador_nombre, entrenador_genero, entrenador_funcion, entrenador_categoria, entrenador_nacionalidad])
+                   [entrenador_id, entrenador_nombre, entrenador_genero, entrenador_funcion, entrenador_categoria, entrenador_nacionalidad])
 
 
 #Poblar Pais
@@ -130,7 +128,7 @@ with open('./Data/medals_total.csv') as csvfile:
         pais_total = row[4] 
         
         cur.execute("insert into pais values (%s, %s, %s, %s, %s)",
-                    [pais_codigo, pais_oros, pais_platas, pais_bronces, pais_total])
+                   [pais_codigo, pais_oros, pais_platas, pais_bronces, pais_total])
 
 
 # Poblar tabla Evento
@@ -141,11 +139,13 @@ with open('./Data/medals.csv') as csvfile:
         i+=1
         if i == 1:
             continue
-        print(i)
-        # Significa que estamos viendo el ganador (medalla de oro)
-        if row[1] == 1:
+
+        
+        if row[1] == 1: # Significa que estamos viendo el ganador (medalla de oro)
+
             evento_disciplina = row[6] 
             evento_genero = row[5]
+
             # Hay 2 eventos con el mismo nombre, ya que está masculino y femenino,
             # asique se hace que el nombre del evento sea la concatenacion del genero al final.
             evento_nombre = evento_disciplina + ' ' + evento_genero 
@@ -158,13 +158,20 @@ with open('./Data/medals.csv') as csvfile:
         medalla_atleta_id = row[10]
         medalla_tipo = row[0]
         cur.execute("insert into medalla values (%s, %s, %s, %s)", 
-                    [medalla_id, medalla_evento_nombre, medalla_atleta_id, medalla_tipo])
+                   [medalla_id, medalla_evento_nombre, medalla_atleta_id, medalla_tipo])
+
+
+# Poblar disciplina
 
 # Poblar evento_disciplina
 
+# Poblar evento_atleta
+
+# Poblar entrenador_atleta
+
 
 # Poblar atleta_pais
-for dupla in range(len(atleta_pais_cache)):
+for dupla in atleta_pais_cache:
     atleta_id = dupla[0]
     pais_id = dupla[1]
 

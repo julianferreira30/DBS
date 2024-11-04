@@ -27,10 +27,6 @@ create table if not exists entrenador(
 create table if not exists pais(
     id varchar(255) primary key,
     recuento_medallas integer not null,
-
-
-
-
     oros integer not null,
     platas integer not null,
     bronces integer not null,
