@@ -184,15 +184,18 @@ evento_disciplina_cache = set()  # Cache para evitar duplicados
 with open('./Data/medals.csv') as medals_file:
     medals_reader = csv.DictReader(medals_file)
     for row in medals_reader:
-        nombre_evento = row['event']  # Nombre del evento
-        discipline_code = row['discipline']  # Código de la disciplina
+        nombre_evento = row['event']  # Nombre evento
+        discipline_code = row['discipline']  # Código disciplina
+        phase = row.get('phase', None)  # Fase del evento
+        venue = row.get('venue', None)  # Lugar del evento
 
         # Verificar cache
         if (nombre_evento, discipline_code) not in evento_disciplina_cache:
             # Insertar la relación
-            cur.execute("INSERT INTO evento_disciplina (evento_nombre, disciplina_id) VALUES (%s, %s)",
-                        (nombre_evento, discipline_code))
+            cur.execute("INSERT INTO evento_disciplina (disciplina_id, evento_nombre, phase, venue) VALUES (%s, %s, %s, %s)",
+                        (discipline_code, nombre_evento, phase, venue))
             evento_disciplina_cache.add((nombre_evento, discipline_code))  # Añadir al cache
+
 
 # Poblar evento_atleta (Relacion Compite_en)
 evento_atleta_cache = set()  # Cache para evitar duplicados
