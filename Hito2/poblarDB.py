@@ -1,9 +1,13 @@
 import psycopg2
 import csv
 
-conn = psycopg2.connect(host="cc3201.dcc.uchile.cl", database="cc3201",
+conn = psycopg2.connect(
+    host="cc3201.dcc.uchile.cl",
+    database="cc3201",
     user="cc3201",
-    password="j'<3_cc3201", port="5440")
+    password="6Platija%Cinzaya6Vergueta!",
+    port="308"
+)
 
 cur = conn.cursor()
 
@@ -161,6 +165,18 @@ with open('./Data/medals.csv') as csvfile:
 
 
 # Poblar disciplina
+disciplinas_cache = set()  # Cache para evitar duplicados
+with open('./Data/schedules.csv') as csvfile:
+    reader = csv.DictReader(csvfile)
+    for row in reader:
+        discipline_code = row['discipline_code']
+        discipline_name = row['discipline']
+
+        # Verificar si ya se agregó esta disciplina
+        if discipline_code not in disciplinas_cache:
+            cur.execute("INSERT INTO disciplina (codigo, nombre) VALUES (%s, %s)", 
+                        (discipline_code, discipline_name))
+            disciplinas_cache.add(discipline_code)
 
 # Poblar evento_disciplina
 
