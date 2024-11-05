@@ -174,16 +174,66 @@ with open('./Data/schedules.csv') as csvfile:
 
         # Verificar si ya se agregó esta disciplina
         if discipline_code not in disciplinas_cache:
-            cur.execute("INSERT INTO disciplina (codigo, nombre) VALUES (%s, %s)", 
-                        (discipline_code, discipline_name))
+            cur.execute("INSERT INTO disciplina (nombre) VALUES (%s)", 
+                        (discipline_name,))
             disciplinas_cache.add(discipline_code)
 
 # Poblar evento_disciplina
+evento_disciplina_cache = set()  # Cache para evitar duplicados
 
-# Poblar evento_atleta
+with open('./Data/medals.csv') as medals_file:
+    medals_reader = csv.DictReader(medals_file)
+    for row in medals_reader:
+        nombre_evento = row['event']  # Nombre del evento
+        discipline_code = row['discipline']  # Código de la disciplina
 
-# Poblar entrenador_atleta
+        # Verificar cache
+        if (nombre_evento, discipline_code) not in evento_disciplina_cache:
+            # Insertar la relación
+            cur.execute("INSERT INTO evento_disciplina (evento_nombre, disciplina_id) VALUES (%s, %s)",
+                        (nombre_evento, discipline_code))
+            evento_disciplina_cache.add((nombre_evento, discipline_code))  # Añadir al cache
 
+# Poblar evento_atleta (Relacion Compite_en)
+evento_atleta_cache = set()  # Cache para evitar duplicados
+
+with open('./Data/medals.csv') as medals_file:
+    medals_reader = csv.DictReader(medals_file)
+    for row in medals_reader:
+        nombre_evento = row['event']  # Nombre evento
+        codigo_atleta = row['code']  # Código atleta
+
+        # Verificar relación
+        if (nombre_evento, codigo_atleta) not in evento_atleta_cache:
+            # Insertar rel
+            cur.execute("INSERT INTO evento_atleta (evento_nombre, atleta_id) VALUES (%s, %s)",
+                        (nombre_evento, codigo_atleta))
+            evento_atleta_cache.add((nombre_evento, codigo_atleta))  # Añadir al cache
+
+
+# Poblar entrenador_atleta (coaches / athletes)
+entrenador_atleta_cache = set()
+
+coaches_data = {}
+with open('./Data/coaches.csv') as coaches_file:
+    coaches_reader = csv.DictReader(coaches_file)
+    for coach in coaches_reader:
+        coach_code = coach['code']
+        coach_discipline = coach['disciplines'].strip("[]").replace("'", "").split(", ")
+        coaches_data[coach_code] = coach_discipline
+
+with open('./Data/athletes.csv') as athletes_file:
+    athletes_reader = csv.DictReader(athletes_file)
+    for athlete in athletes_reader:
+        athlete_code = athlete['code']
+        athlete_discipline = athlete['disciplines'].strip("[]").replace("'", "").split(", ")
+
+        for coach_code, coach_discipline in coaches_data.items():
+            if set(athlete_discipline) & set(coach_discipline):
+                if (coach_code, athlete_code) not in entrenador_atleta_cache:
+                    cur.execute("INSERT INTO entrenador_atleta (entrenador_id, atleta_id) VALUES (%s, %s)",
+                                (coach_code, athlete_code))
+                    entrenador_atleta_cache.add((coach_code, athlete_code))
 
 # Poblar atleta_pais
 for dupla in atleta_pais_cache:
