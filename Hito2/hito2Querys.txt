@@ -23,6 +23,19 @@ create table if not exists entrenador(
     nacionalidad varchar(255) not null
 );
 
+-----------Equipo---------------
+create table if not exists equipo(
+    id varchar(255),
+    atleta_id integer,
+    nombre varchar(255),
+    pais varchar(255),
+    genero varchar(255),
+    disciplina varchar(255),
+    events varchar,
+    primary key (id, atleta_id),
+    foreign key atleta_id references atleta(id) 
+);
+
 -----Pais------
 create table if not exists pais(
     id varchar(255) primary key,
@@ -61,7 +74,7 @@ create table if not exists medalla_individual(
 create table if not exists medalla_grupal(
     id integer not null,
     evento_nombre varchar(255) not null,
-    equipo_id integer not null,
+    equipo_id varchar(255) not null,
     tipo varchar(255) not null,
     primary key (id, evento_nombre, atleta_id),
     foreign key (evento_nombre) references evento(nombre),

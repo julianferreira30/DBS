@@ -11,15 +11,16 @@ conn = psycopg2.connect(
 
 cur = conn.cursor()
 
-#cur.execute("truncate table atleta restart identity cascade")
-#cur.execute("truncate table pais restart identity cascade")
-#cur.execute("truncate table entrenador restart identity cascade")
-#cur.execute("truncate table disciplina restart identity cascade")
-#cur.execute("truncate table evento restart identity cascade")
-#cur.execute("truncate table medalla restart identity cascade")
-#cur.execute("truncate table evento_disciplina restart identity cascade")
-#cur.execute("truncate table disciplina_atleta restart identity cascade")
-#cur.execute("truncate table entrenador_atleta restart identity cascade")
+cur.execute("truncate table atleta restart identity cascade")
+cur.execute("truncate table pais restart identity cascade")
+cur.execute("truncate table entrenador restart identity cascade")
+cur.execute("truncate table disciplina restart identity cascade")
+cur.execute("truncate table evento restart identity cascade")
+cur.execute("truncate table medalla_individual restart identity cascade")
+cur.execute("truncate table medalla_grupal restart identity cascade")
+cur.execute("truncate table evento_disciplina restart identity cascade")
+cur.execute("truncate table disciplina_atleta restart identity cascade")
+cur.execute("truncate table entrenador_atleta restart identity cascade")
 
 # Guardar datos de país asociados a atletas
 atleta_pais_cache = []
@@ -71,6 +72,25 @@ with open('./Data/athletes.csv') as csvfile:
         cur.execute("insert into atleta values (%s, %s, %s, %s, %s, %s, %s, %s, %s)",
                    [atleta_id, atleta_nombre, atleta_genero, atleta_nacionalidad, atleta_pais_residencia, atleta_altura, atleta_peso, atleta_fecha_nacimiento, atleta_lugar_nacimiento])
 
+# Poblar Equipos
+with open('./Data/teams.csv') as csvfile:
+    reader = csv.reader(csvfile, delimiter=',', quotechar='"')
+    i = 0
+    for row in reader:
+        i+=1
+        if i == 1:
+            continue
+        team_id = row[0]
+        team_name = row[1]
+        team_gender = row[2]
+        team_country = row[3]
+        team_discipline = row[6]
+        team_event = row[8]
+        athletes_IDS = row[11]
+        for id in athletes_IDS:
+            athlete_id = id.toInt
+            cur.execute("insert into equipo values (%s, %s, %s, %s, %s, %s, %s)", 
+                        [team_id, athlete_id, team_name, team_country, team_gender, team_discipline, team_event])
 
 # Poblar Entrenador
 with open('./Data/coaches.csv') as csvfile:
@@ -177,7 +197,11 @@ with open('./Data/medals.csv') as csvfile:
         medalla_evento_nombre = row[6] + ' ' + row[5]
         medalla_atleta_id = row[10]
         medalla_tipo = row[0]
-        cur.execute("insert into medalla values (%s, %s, %s, %s)", 
+        if isinstance(medalla_atleta_id, int):
+            cur.execute("insert into medalla_individual values (%s, %s, %s, %s)", 
+                   [medalla_id, medalla_evento_nombre, medalla_atleta_id, medalla_tipo])
+        else:
+            cur.execute("insert into medalla_grupal values (%s, %s, %s, %s)", 
                    [medalla_id, medalla_evento_nombre, medalla_atleta_id, medalla_tipo])
 
 
