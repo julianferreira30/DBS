@@ -1,20 +1,30 @@
-Creación de tablas:
 
----------Atleta-------
-create table if not exists atleta(
-    id varchar(255) primary key,
-    nombre varchar(255) not null,
-    genero varchar(255) not null,
-    nacionalidad varchar(255) not null,
-    pais_residencia varchar(255),
+import psycopg2
+import csv
+
+conn = psycopg2.connect(
+    host="cc3201.dcc.uchile.cl",
+    database="cc3201",
+    user="cc3201",
+    password="cc3201",
+    port="5508"
+)
+
+cur = conn.cursor()
+cur.execute("create table if not exists atleta( \
+               id varchar(255) primary key, \
+    nombre varchar(255) not null, \ 
+    genero varchar(255) not null, \
+    nacionalidad varchar(255) not null, \
+    pais_residencia varchar(255), \
     altura integer,
     peso float,
     fecha_nacimiento varchar(255) not null,
     lugar_nacimiento varchar(255)
-);
+")
 
-------Entrenador----
-create table if not exists entrenador(
+
+ aux = "create table if not exists entrenador(
     id integer primary key,
     nombre varchar(255) not null,
     genero varchar(255) not null,
@@ -25,14 +35,15 @@ create table if not exists entrenador(
 
 -----------Equipo---------------
 create table if not exists equipo(
-    id varchar(255) primary key,
-    atleta_id varchar(255),
+    id varchar(255),
+    atleta_id integer,
     nombre varchar(255),
     pais varchar(255),
     genero varchar(255),
     disciplina varchar(255),
     events varchar,
-    foreign key (atleta_id) references atleta(id) 
+    primary key (id, atleta_id),
+    foreign key atleta_id references atleta(id) 
 );
 
 -----Pais------
@@ -72,7 +83,7 @@ create table if not exists medalla_grupal(
     evento_nombre varchar(255) not null,
     equipo_id varchar(255) not null,
     tipo varchar(255) not null,
-    primary key (id, evento_nombre, equipo_id),
+    primary key (id, evento_nombre, atleta_id),
     foreign key (evento_nombre) references evento(nombre),
     foreign key (equipo_id) references equipo(id)
 );
