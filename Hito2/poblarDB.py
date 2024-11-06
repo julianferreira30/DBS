@@ -5,12 +5,11 @@ conn = psycopg2.connect(
     host="cc3201.dcc.uchile.cl",
     database="cc3201",
     user="cc3201",
-    password="6Platija%Cinzaya6Vergueta!",
-    port="308"
+    password="cc3201",
+    port="5508"
 )
 
 cur = conn.cursor()
-
 
 #cur.execute("truncate table atleta restart identity cascade")
 #cur.execute("truncate table pais restart identity cascade")
@@ -22,6 +21,7 @@ cur = conn.cursor()
 #cur.execute("truncate table disciplina_atleta restart identity cascade")
 #cur.execute("truncate table entrenador_atleta restart identity cascade")
 
+# Guardar datos de país asociados a atletas
 atleta_pais_cache = []
 with open('./Data/athletes.csv') as csvfile:
     reader = csv.reader(csvfile, delimiter=',', quotechar='"')
@@ -56,7 +56,6 @@ with open('./Data/athletes.csv') as csvfile:
         if atleta_peso == "" or int(float(atleta_peso)) == 0:
             atleta_peso = None
         
-
         atleta_fecha_nacimiento = str(row[16])
         atleta_lugar_nacimiento = row[17]
         if atleta_lugar_nacimiento == "":
@@ -101,9 +100,6 @@ with open('./Data/coaches.csv') as csvfile:
         
         entrenador_categoria = row[4]
 
-
-        # Creo que puede ser en que país dirige, no necesariamente su nacionalidad
-
         entrenador_nacionalidad = row[6]
 
         # Podríamos incluir la disciplina que coachea
@@ -121,9 +117,6 @@ with open('./Data/medals_total.csv') as csvfile:
             continue
         print(i)
 
-        # Cambie nombre, a codigo del pais, por como están los datos
-        # Además incluiré la cantidad de oros, platas y bronces
-
         pais_codigo = row[0]
         pais_oros = row[1]
         pais_platas = row[2]
@@ -132,36 +125,6 @@ with open('./Data/medals_total.csv') as csvfile:
         
         cur.execute("insert into pais values (%s, %s, %s, %s, %s)",
                    [pais_codigo, pais_oros, pais_platas, pais_bronces, pais_total])
-
-
-# Poblar tabla Evento
-with open('./Data/medals.csv') as csvfile:
-    reader = csv.reader(csvfile, delimiter=',', quotechar='"')
-    i = 0
-    for row in reader:
-        i+=1
-        if i == 1:
-            continue
-
-        
-        if row[1] == 1: # Significa que estamos viendo el ganador (medalla de oro)
-
-            evento_disciplina = row[6] 
-            evento_genero = row[5]
-
-            # Hay 2 eventos con el mismo nombre, ya que está masculino y femenino,
-            # asique se hace que el nombre del evento sea la concatenacion del genero al final.
-            evento_nombre = evento_disciplina + ' ' + evento_genero 
-            evento_ganador = row[3]
-            cur.execute("insert into evento values (%s, %s)", [evento_nombre, evento_ganador])
-        
-        # Aprovechamos de poblar la tabla Medalla
-        medalla_id = row[1]
-        medalla_evento_nombre = row[6] + ' ' + row[5]
-        medalla_atleta_id = row[10]
-        medalla_tipo = row[0]
-        cur.execute("insert into medalla values (%s, %s, %s, %s)", 
-                   [medalla_id, medalla_evento_nombre, medalla_atleta_id, medalla_tipo])
 
 
 # Poblar disciplina
@@ -177,6 +140,46 @@ with open('./Data/schedules.csv') as csvfile:
             cur.execute("INSERT INTO disciplina (nombre) VALUES (%s)", 
                         (discipline_name,))
             disciplinas_cache.add(discipline_code)
+
+
+# Poblar tabla Evento evitando duplicados
+evento_cache = set()
+with open('./Data/medals.csv') as csvfile:
+    reader = csv.reader(csvfile, delimiter=',', quotechar='"')
+    i = 0
+    for row in reader:
+        i+=1
+        if i == 1:
+            continue
+
+        # Poblar eventos
+        evento_disciplina = row[6]
+        evento_genero = row[5]
+        evento_nombre = evento_disciplina + ' ' + evento_genero 
+        evento_ganador = row[3]
+
+        # Verificar duplicado
+        if evento_nombre not in evento_cache:
+            cur.execute("insert into evento values (%s, %s)", [evento_nombre, evento_ganador])
+            evento_cache.add(evento_nombre)
+
+
+# Poblar tabla Medalla
+with open('./Data/medals.csv') as csvfile:
+    reader = csv.reader(csvfile, delimiter=',', quotechar='"')
+    i = 0
+    for row in reader:
+        i+=1
+        if i == 1:
+            continue
+        
+        medalla_id = row[1]
+        medalla_evento_nombre = row[6] + ' ' + row[5]
+        medalla_atleta_id = row[10]
+        medalla_tipo = row[0]
+        cur.execute("insert into medalla values (%s, %s, %s, %s)", 
+                   [medalla_id, medalla_evento_nombre, medalla_atleta_id, medalla_tipo])
+
 
 # Poblar evento_disciplina
 evento_disciplina_cache = set()  # Cache para evitar duplicados
@@ -238,9 +241,17 @@ with open('./Data/athletes.csv') as athletes_file:
                                 (coach_code, athlete_code))
                     entrenador_atleta_cache.add((coach_code, athlete_code))
 
+
 # Poblar atleta_pais
 for dupla in atleta_pais_cache:
     atleta_id = dupla[0]
     pais_id = dupla[1]
 
     cur.execute("insert into atleta_pais values (%s, %s)", [atleta_id, pais_id])
+
+# Commit changes
+conn.commit()
+
+# Close connection
+cur.close()
+conn.close()
