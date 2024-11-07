@@ -13,8 +13,8 @@ conn = psycopg2.connect(
 
 cur = conn.cursor()
 
-#cur.execute("truncate table atleta restart identity cascade")
-#cur.execute("truncate table equipo restart identity cascade")
+cur.execute("truncate table atleta restart identity cascade")
+cur.execute("truncate table equipo restart identity cascade")
 cur.execute("truncate table pais restart identity cascade")
 cur.execute("truncate table entrenador restart identity cascade")
 cur.execute("truncate table disciplina restart identity cascade")
