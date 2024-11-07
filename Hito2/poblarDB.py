@@ -24,7 +24,6 @@ cur.execute("truncate table medalla_grupal restart identity cascade")
 cur.execute("truncate table evento_disciplina restart identity cascade")
 cur.execute("truncate table entrenador_atleta restart identity cascade")
 
-"""
 # Guardar datos de país asociados a atletas
 atleta_pais_cache = []
 with open('./Data/athletes.csv') as csvfile:
@@ -74,7 +73,6 @@ with open('./Data/athletes.csv') as csvfile:
 
         cur.execute("insert into atleta values (%s, %s, %s, %s, %s, %s, %s, %s, %s)",
                    [atleta_id, atleta_nombre, atleta_genero, atleta_nacionalidad, atleta_pais_residencia, atleta_altura, atleta_peso, atleta_fecha_nacimiento, atleta_lugar_nacimiento])
-conn.commit()
 
 # Poblar Equipos
 with open('./Data/teams.csv') as csvfile:
@@ -106,8 +104,6 @@ with open('./Data/teams.csv') as csvfile:
                         [team_id, athlete_id, team_name, team_country, team_gender, team_discipline, team_event])
             except ValueError:
                 continue 
-conn.commit()
-"""
 
 # Poblar Entrenador
 with open('./Data/coaches.csv') as csvfile:
