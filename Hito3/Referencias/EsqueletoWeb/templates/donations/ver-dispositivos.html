@@ -1,0 +1,51 @@
+{% extends 'donations/baseNavbar.html' %}
+{% block title %}
+Ver dispositivos
+{% endblock %}
+{% block css %}
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/ver-dispositivos.css') }}">
+{% endblock%}
+{% block mainContainer %}
+
+{% if data %}
+    <h1>Dispositivos disponibles</h1>
+    <table id="tablaDispositivos" >
+        <thead>
+            <tr>
+                <th>Tipo</th>
+                <th>Nombre dispositivo</th>
+                <th>Estado</th>
+                <th>Comuna</th>
+                <th>Fotos</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for dispositivo in data %}
+            <tr data-id = "{{dispositivo.id}}">
+                <td>{{dispositivo.tipo}}</td>
+                <td>{{dispositivo.nombre}}</td>
+                <td>{{dispositivo.estado}}</td>
+                <td>{{dispositivo.comuna}}</td>
+                <td><img src="{{dispositivo.path_image}}" class="img120" alt="Imagen"></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <div class="pagination">
+        {% if page > 1 %}
+        <a href="{{ url_for('ver_dispositivos', page=page-1) }}">&laquo; Anterior</a>
+        {% endif %}
+        
+        <span>Página {{ page }} de {{ total_pages }}</span>
+        
+        {% if page < total_pages %}
+        <a href="{{ url_for('ver_dispositivos', page=page+1) }}">Siguiente &raquo;</a>
+        {% endif %}
+    </div>
+{% endif %}
+
+{% endblock %}
+
+{% block javascript %}
+<script src="{{ url_for('static', filename='js/ver-dispositivos.js') }}"></script>
+{% endblock %}

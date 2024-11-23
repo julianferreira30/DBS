@@ -1,0 +1,23 @@
+{% extends 'donations/baseNavbar.html' %}
+{%block title%}
+Agregar donación    
+{% endblock%}
+{% block css %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/graficos.css') }}">
+{% endblock %}
+{% block mainContainer %}
+
+<div class="grafico-container">
+    <figure class="highcharts-figure">
+        <div id="container"></div>
+        <p class="descripcion-grafico">
+            Este gráfico representa cuantas donaciones por comuna hay
+        </p>
+    </figure>
+</div>
+{% endblock %}
+
+{% block javascript %}
+<script src="https://code.highcharts.com/highcharts.js"></script>
+<script src="{{url_for('static', filename='js/grafico-contactos.js')}}"></script>
+{% endblock %}
