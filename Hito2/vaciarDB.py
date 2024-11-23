@@ -12,11 +12,12 @@ cur = conn.cursor()
 
 # Lista de todas las tablas que deseas vaciar
 tables = [
-    "medalla", 
+    "medalla_individual", 
     "evento_atleta", 
     "atleta_pais", 
     "entrenador_atleta", 
     "evento_disciplina", 
+    "medalla_grupal",
     "disciplina", 
     "evento", 
     "pais", 

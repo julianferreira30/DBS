@@ -1,0 +1,74 @@
+{% extends 'donations/baseNavbar.html' %}
+{%block title%}
+Agregar donación    
+{% endblock%}
+{% block css %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/agregar-donacion.css') }}">
+{% endblock %}
+{% block mainContainer %}
+        <div id="val-box" hidden>
+            <h2 id="val-msg"></h2>
+            <ul id="val-list"></ul>
+        </div>
+        <form id = "myForm" name="myForm" action="{{url_for('agregar_donacion')}}" method="POST" enctype="multipart/form-data">
+            <label for="nombre">Nombre donante</label>
+            <input type="text" name="nombre" id="nombre" size="80" required placeholder="EJ: Juan Pérez"><br>
+            
+            <label for="email">Email donante</label>
+            <input type="email" name="email" id="email" size="30" required placeholder="EJ: juanperez@email.com"><br>
+            
+            <label for="phone">Número celular donante</label>
+            <input type="tel" name="phone" id="phone" size="15" placeholder="EJ: 912345678"><br>
+            
+            <label for="select-region">Región</label>
+            <select name="select-region" id="select-region" required>
+                <option value="">Seleccione región</option>
+            </select><br>
+            
+            <label for="select-comuna">Comuna</label>
+            <select name="select-comuna" id="select-comuna" required>
+                <option value="">Seleccione comuna</option>
+            </select><br>     
+            
+            <div id="form-wrapper">
+                <div class="form-container" id="form-template">
+                    <div class="form-group">
+                        <label for="name-dispositivo">Nombre dispositivo</label>
+                        <input type="text" id="name-dispositivo" name="name-dispositivo" size="80" required placeholder="EJ: PlayStation">
+                    </div>
+                    <div class="form-group">
+                        <label for="descripcion-dispositivo">Descripción</label>
+                        <input type="text" id="descripcion-dispositivo" name="descripcion-dispositivo"  required placeholder="EJ: PlayStation de 40cm de alto">
+                    </div>
+                    <div class="form-group">
+                        <label for="select-tipo-dispositivo">Tipo dispositivo</label>
+                        <select name="select-tipo-dispositivo" id="select-tipo-dispositivo" required>
+                            <option value="">Seleccione tipo del dispositivo</option>
+                        </select><br>
+                    </div>
+                    <div class="form-group">
+                        <label for="annos-uso">Años de uso</label>
+                        <input type="number" id="annos-uso" name="annos-uso"  required placeholder="Entre 1-99">
+                    </div>
+                    <div class="form-group">
+                        <label for="select-funcionamiento">Tipo dispositivo</label>
+                        <select name="select-funcionamiento" id="select-funcionamiento" required>
+                            <option value="">Seleccione estado de funcionamiento</option>
+                        </select><br>
+                    </div>
+                    <div class="form-group">
+                        <label for="files">Foto de dispositivo</label>
+                        <input type="file" name="files" id="files" multiple accept="image/*,.pdf" required><br>
+                    </div>
+                    
+            </div>
+        </div>
+        
+        <button id="submit-btn" type="button">Publicar esta donación</button>
+        <button id="add-form" type="button">Agregar otro dispositivo a esta donación</button>
+    </form>
+{% endblock %}
+{% block javascript %}    
+    <script src="{{ url_for('static', filename='js/poblar-select.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/agregar-dispositivo.js') }}"></script>
+{%endblock%}

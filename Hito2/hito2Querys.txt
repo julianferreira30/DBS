@@ -73,7 +73,7 @@ create table if not exists medalla_grupal(
     evento_nombre varchar(255) not null,
     equipo_id varchar(255) not null,
     tipo varchar(255) not null,
-    primary key (id, evento_nombre, equipo_id, atleta_id),
+    primary key (id, atleta_id, evento_nombre, equipo_id),
     foreign key (evento_nombre) references evento(nombre),
     foreign key (equipo_id, atleta_id) references equipo(id, atleta_id)
 );

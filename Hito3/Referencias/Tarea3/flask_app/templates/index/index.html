@@ -1,0 +1,40 @@
+{% extends 'index/base.html' %}
+{% block title %}
+ Tarea 2 
+{% endblock %}
+{% block css %}
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/index.css')}}">
+{% endblock %}
+{% block content %}
+    <div class="container">
+        <div class="header">
+            <header>
+                <h1>DONAPP</h1>
+            </header>
+        </div>
+
+        <form action="{{ url_for('botones_index') }}" method="POST">
+            <input type="hidden" name="action" value="agregar_donacion">
+            <button type="submit" id="donacion">Agregar donación</button>
+        </form>
+    
+        <form action="{{ url_for('botones_index') }}" method="POST">
+            <input type="hidden" name="action" value="ver_dispositivos">
+            <button type="submit" id="dispositivos">Ver dispositivos</button>
+        </form>
+
+        <form action="{{ url_for('botones_index') }}" method="POST">
+            <input type="hidden" name="action" value="grafico_contactos">
+            <button type="submit" id="grafico_contactos">Gráfico de contactos</button>
+        </form>
+        
+        
+        <form action="{{ url_for('botones_index') }}" method="POST">
+            <input type="hidden" name="action" value="grafico_dispositivos">
+            <button type="submit" id="grafico_dispositivos">Gráfico de dispositivos</button>
+        </form>
+
+    </div>
+{% endblock %}
+{% block javascript %}
+{% endblock %}

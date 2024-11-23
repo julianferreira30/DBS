@@ -1,0 +1,89 @@
+{% extends 'donations/baseNavbar.html' %}
+{%block title%}
+Información dispositivo   
+{% endblock%}
+{% block css %}
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/informacion-dispositivo.css') }}">
+{% endblock %}
+{% block mainContainer %}
+
+{% if data %}
+<div id="donante-info" class="secondary-container">
+            <h2>Información de contacto</h2>
+            <div class="info-container">
+                    <h3>Nombre donante:</h3>
+                    <p id="nombre-donante">{{data[0].nombre_contacto}}</p>
+                
+                    <h3>Email donante:</h3>
+                    <p id="email-donante">{{data[0].email}}</p>
+                
+                    <h3>Numero de celular donante:</h3>
+                    <p id="num-donante">{{data[0].telefono}}</p>
+            
+                    <h3>Región, comuna:</h3>
+                    <p id="comuna-donante">{{data[0].region}}, {{data[0].comuna}}</p>
+                
+            </div>
+        </div>
+        <div id="dispositivo-info" class="secondary-container">
+            <h2>Información de dispositivo</h2>
+                <div class="info-container">
+                    <h3>Nombre dispositivo:</h3>
+                    <p id="nombre-dispositivo">{{data[0].nombre_disp}}</p>
+                
+                    <h3>Descripcion:</h3>
+                    <p id="descripcion-dispositivo">{{data[0].descripcion}}</p>
+                
+                    <h3>Tipo:</h3>
+                    <p id="tipo-dispositivo">{{data[0].tipo}}</p>
+            
+                    <h3>Años de uso:</h3>
+                    <p id="annoUso-dispositivo">{{data[0].annos_uso}}</p>
+
+                    <h3>Estado:</h3>
+                    <p id="estado-dispositivo">{{data[0].estado}}</p>
+
+                    <h3>Fotos:</h3>
+                    {%for img in data[0].path_image%}
+                        <img src="{{img}}" class="img640" alt = "img640">
+                    {%endfor%}
+                </div>
+        </div>
+        {% endif %}
+        {% if comentarios %}
+        <div id="comentarios" class="secondary-container">
+            <h2>Comentarios</h2>
+                {% for coment in comentarios %}
+                    <div class="info-container">
+                        <div class="comentario">
+                            <h3>{{coment.nombre}}, {{coment.fecha}}</h3>
+                            <p>{{coment.texto}}</p>
+                        </div>    
+                    </div>
+                {% endfor %}    
+        {% endif %}
+            <div class="form-container">
+                <h2>Deja tu comentario</h2>
+                <div id="val-box" hidden>
+                    <h2 id="val-msg"></h2>
+                    <ul id="val-list"></ul>
+                </div>
+                <form name="myForm" action="{{ url_for('informacion_dispositivos', dispositivo_id=data[0].id) }}" method="POST" enctype="multipart/form-data">
+                    <label for="nombre-annadido">Nombre:</label>
+                    <input type="text" name="nombre" id="nombre-annadido" size="80" required placeholder="EJ: Juan Pérez"><br>
+                    
+                    <label for="comentario-annadido">Comentario:</label>
+                    <input type="text" name="comentario" id="comentario-annadido" size="30" required placeholder="EJ: Buen producto"><br>
+                    
+                    <button id="comentario-btn">Agregar comentario</button>
+                </form>
+            </div>
+
+        </div>
+        <div id="image-overlay">
+            <img src="" id="image-overlay-img" style="max-width:90%; max-height:90%;" alt="Vista ampliada">
+        </div>
+{% endblock %}
+{% block javascript %}    
+    <script src="{{ url_for('static', filename='js/informacion-dispositivo.js') }}"></script>
+{%endblock%}

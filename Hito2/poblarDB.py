@@ -13,6 +13,7 @@ conn = psycopg2.connect(
 
 cur = conn.cursor()
 
+'''
 cur.execute("truncate table atleta restart identity cascade")
 cur.execute("truncate table equipo restart identity cascade")
 cur.execute("truncate table pais restart identity cascade")
@@ -23,9 +24,11 @@ cur.execute("truncate table medalla_individual restart identity cascade")
 cur.execute("truncate table medalla_grupal restart identity cascade")
 cur.execute("truncate table evento_disciplina restart identity cascade")
 cur.execute("truncate table entrenador_atleta restart identity cascade")
+'''
 
 # Guardar datos de país asociados a atletas
 atleta_pais_cache = []
+pais_con_medallas_cache = []
 with open('./Data/athletes.csv') as csvfile:
     reader = csv.reader(csvfile, delimiter=',', quotechar='"')
     i = 0
@@ -67,13 +70,14 @@ with open('./Data/athletes.csv') as csvfile:
         ############ SOLO PARA VER COMO SE VE LA INFO ########################
         info = [atleta_id, atleta_nombre, atleta_fecha_nacimiento, atleta_genero]
         #print(info)
-        ########################
+        #######################
 
         atleta_pais_cache.append([atleta_id, atleta_pais_id])
 
-        cur.execute("insert into atleta values (%s, %s, %s, %s, %s, %s, %s, %s, %s)",
-                   [atleta_id, atleta_nombre, atleta_genero, atleta_nacionalidad, atleta_pais_residencia, atleta_altura, atleta_peso, atleta_fecha_nacimiento, atleta_lugar_nacimiento])
-
+        #cur.execute("insert into atleta values (%s, %s, %s, %s, %s, %s, %s, %s, %s)",
+         #          [atleta_id, atleta_nombre, atleta_genero, atleta_nacionalidad, atleta_pais_residencia, atleta_altura, atleta_peso, atleta_fecha_nacimiento, atleta_lugar_nacimiento])
+conn.commit()
+'''
 # Poblar Equipos
 with open('./Data/teams.csv') as csvfile:
     reader = csv.reader(csvfile, delimiter=',', quotechar='"')
@@ -104,6 +108,7 @@ with open('./Data/teams.csv') as csvfile:
                         [team_id, athlete_id, team_name, team_country, team_gender, team_discipline, team_event])
             except ValueError:
                 continue 
+conn.commit()
 
 # Poblar Entrenador
 with open('./Data/coaches.csv') as csvfile:
@@ -137,8 +142,8 @@ with open('./Data/coaches.csv') as csvfile:
         # Podríamos incluir la disciplina que coachea
         cur.execute("insert into entrenador values (%s, %s, %s, %s, %s, %s)",
                    [entrenador_id, entrenador_nombre, entrenador_genero, entrenador_funcion, entrenador_categoria, entrenador_nacionalidad])
-
-
+conn.commit()
+'''
 #Poblar Pais
 with open('./Data/medals_total.csv') as csvfile:
     reader = csv.reader(csvfile, delimiter=',', quotechar='"')
@@ -154,11 +159,12 @@ with open('./Data/medals_total.csv') as csvfile:
         pais_platas = row[2]
         pais_bronces = row[3]
         pais_total = row[4] 
+        pais_con_medallas_cache.append(pais_codigo)
         
-        cur.execute("insert into pais values (%s, %s, %s, %s, %s)",
-                   [pais_codigo, pais_oros, pais_platas, pais_bronces, pais_total])
-
-
+        #cur.execute("insert into pais values (%s, %s, %s, %s, %s)",
+         #          [pais_codigo, pais_oros, pais_platas, pais_bronces, pais_total])
+conn.commit()
+'''
 # Poblar disciplina
 disciplinas_cache = set()  # Cache para evitar duplicados
 with open('./Data/schedules.csv') as csvfile:
@@ -172,7 +178,7 @@ with open('./Data/schedules.csv') as csvfile:
             cur.execute("INSERT INTO disciplina (nombre) VALUES (%s)", 
                         (discipline_name,))
             disciplinas_cache.add(discipline_code)
-
+conn.commit()
 
 # Poblar tabla Evento evitando duplicados
 evento_cache = set()
@@ -194,8 +200,25 @@ with open('./Data/medals.csv') as csvfile:
         if evento_nombre not in evento_cache:
             cur.execute("insert into evento values (%s, %s)", [evento_nombre, evento_ganador])
             evento_cache.add(evento_nombre)
-
-
+        medalla_id = row[1]
+        medalla_evento_nombre = row[7] + ' ' + row[5]
+        medalla_atleta_id = row[10]
+        medalla_tipo = row[0]
+        if isinstance(medalla_atleta_id, int):
+            cur.execute("insert into medalla_individual values (%s, %s, %s, %s)", 
+                   [medalla_id, medalla_evento_nombre, medalla_atleta_id, medalla_tipo])
+        else:
+            cur.execute("select atleta_id from equipo where id = %s", (medalla_atleta_id, ))
+            todosAtletas = cur.fetchall()
+            print(todosAtletas)
+            print("Los atletas")
+            for atleta in todosAtletas:
+                print(medalla_evento_nombre)
+                cur.execute("insert into medalla_grupal values (%s, %s, %s, %s, %s)", 
+                    [medalla_id, atleta, medalla_evento_nombre, medalla_atleta_id, medalla_tipo])
+conn.commit()
+'''
+'''
 # Poblar tabla Medalla
 with open('./Data/medals.csv') as csvfile:
     reader = csv.reader(csvfile, delimiter=',', quotechar='"')
@@ -219,6 +242,9 @@ with open('./Data/medals.csv') as csvfile:
                 print(medalla_evento_nombre)
                 cur.execute("insert into medalla_grupal values (%s, %s, %s, %s, %s)", 
                     [medalla_id, atleta, medalla_evento_nombre, medalla_atleta_id, medalla_tipo])
+conn.commit()
+'''
+'''
 
 
 # Poblar evento_disciplina
@@ -242,7 +268,7 @@ with open('./Data/medals.csv') as medals_file:
             cur.execute("INSERT INTO evento_disciplina (disciplina_id, evento_nombre, phase, venue) VALUES (%s, %s, %s, %s)",
                         (discipline_code, nombre_evento, phase, venue))
             evento_disciplina_cache.add((nombre_evento, discipline_code))  # Añadir al cache
-
+conn.commit()
 
 # Poblar evento_atleta (Relacion Compite_en)
 evento_atleta_cache = set()  # Cache para evitar duplicados
@@ -268,6 +294,8 @@ with open('./Data/medals.csv') as medals_file:
                     cur.execute("insert into evento_equipo (evento_nombre, equipo_id, atleta_id) VALUES (%s, %s, %s)", 
                                 (nombre_evento, codigo_atleta, atleta))
             evento_atleta_cache.add((nombre_evento, codigo_atleta))  # Añadir al cache
+conn.commit()
+
 
 
 # Poblar entrenador_atleta (coaches / athletes)
@@ -283,6 +311,7 @@ with open('./Data/coaches.csv') as coaches_file:
         coach_code = coach['code']
         coach_discipline = coach['disciplines'].strip("[]").replace("'", "").split(", ")
         coaches_data[coach_code] = coach_discipline
+conn.commit()
 
 with open('./Data/athletes.csv') as athletes_file:
     athletes_reader = csv.DictReader(athletes_file)
@@ -300,6 +329,61 @@ with open('./Data/athletes.csv') as athletes_file:
                                 (coach_code, athlete_code))
                     entrenador_atleta_cache.add((coach_code, athlete_code))
 
+#TEST
+
+# Poblar entrenador_atleta (coaches / athletes)
+entrenador_atleta_cache = set()
+
+# Crear un índice por disciplina para los entrenadores
+coaches_by_discipline = {}
+
+with open('./Data/coaches.csv') as coaches_file:
+    coaches_reader = csv.DictReader(coaches_file)
+    for coach in coaches_reader:
+        coach_code = coach['code']
+        coach_disciplines = coach['disciplines'].strip("[]").replace("'", "").split(", ")
+
+        # Indexar entrenadores por disciplina
+        for discipline in coach_disciplines:
+            if discipline not in coaches_by_discipline:
+                coaches_by_discipline[discipline] = []
+            coaches_by_discipline[discipline].append(coach_code)
+
+# Procesar atletas
+with open('./Data/athletes.csv') as athletes_file:
+    athletes_reader = csv.DictReader(athletes_file)
+    i = 0
+    for athlete in athletes_reader:
+        i += 1
+        print(f"{i} - Procesando atleta")
+
+        athlete_code = athlete['code']
+        athlete_disciplines = athlete['disciplines'].strip("[]").replace("'", "").split(", ")
+
+        # Encontrar entrenadores para disciplinas del atleta
+        possible_coaches = set()
+        for discipline in athlete_disciplines:
+            if discipline in coaches_by_discipline:
+                possible_coaches.update(coaches_by_discipline[discipline])
+
+        # Insertar relaciones entrenador-atleta
+        for coach_code in possible_coaches:
+            if (coach_code, athlete_code) not in entrenador_atleta_cache:
+                cur.execute("INSERT INTO entrenador_atleta (entrenador_id, atleta_id) VALUES (%s, %s)",
+                            (coach_code, athlete_code))
+                entrenador_atleta_cache.add((coach_code, athlete_code))
+
+
+
+'''
+
+
+
+
+
+
+
+
 
 # Poblar atleta_pais
 i = 0
@@ -308,9 +392,13 @@ for dupla in atleta_pais_cache:
     print(str(i)+ "atleta_pais")
     atleta_id = dupla[0]
     pais_id = dupla[1]
-
-    cur.execute("insert into atleta_pais values (%s, %s)", [atleta_id, pais_id])
-
+    if pais_id in pais_con_medallas_cache:
+        cur.execute("insert into atleta_pais values (%s, %s)", [atleta_id, pais_id])
+    else:
+        cur.execute("insert into pais values (%s, %s, %s, %s, %s)",
+                   [pais_id, 0, 0, 0, 0])
+        pais_con_medallas_cache.append(pais_id)
+        cur.execute("insert into atleta_pais values (%s, %s)", [atleta_id, pais_id])
 # Commit changes
 conn.commit()
 

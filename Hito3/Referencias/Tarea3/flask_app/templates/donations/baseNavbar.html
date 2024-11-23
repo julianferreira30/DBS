@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <title>{% block title %}{% endblock %}</title>
+    {% block css %}
+    {% endblock %}
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code&family=Roboto&display=swap" rel="stylesheet">
+  </head>
+  <body>
+    <div class="navbar">
+        <img id="logo-id" src="{{ url_for('static', filename='imagenes/redPanda.png') }}" alt="Donapp" />
+        <h1>DONAPP</h1>
+        <a class="navbar-page" href="{{ url_for('ver_dispositivos') }}">Ver dispositivos</a>
+        <a id="logout-btn" href="{{ url_for('index') }}">Volver a inicio</a>
+    </div>
+    <div class="main-container">
+        {% block mainContainer %}{% endblock %} 
+        {% block javascript %}{% endblock %}
+    </div>
+</body>
+</html>
